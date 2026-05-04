@@ -1,0 +1,254 @@
+.pageHeader {
+  margin-bottom: 2rem;
+}
+
+.securityBanner {
+  background-color: #eff4ff;
+  border: 1px solid #d1e0ff;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 600px;
+  margin: 0 auto 3rem;
+  position: relative;
+}
+
+.stepLine {
+  position: absolute;
+  top: 24px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background-color: var(--border);
+  z-index: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 1;
+  background-color: var(--background);
+  padding: 0 1rem;
+}
+
+.stepIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: white;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--text-muted);
+}
+
+.stepActive .stepIcon {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: #eff4ff;
+}
+
+.stepLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stepActive .stepLabel {
+  color: var(--primary);
+}
+
+.formCard {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  margin-bottom: 2rem;
+}
+
+.formTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.formSubtitle {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.input, .textarea, .select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text-main);
+  transition: border-color 0.2s;
+}
+
+.input:focus, .textarea:focus, .select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.row {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.col {
+  flex: 1;
+}
+
+.urgencyGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.urgencyBtn {
+  flex: 1;
+  padding: 0.75rem;
+  background-color: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-weight: 500;
+  color: var(--text-main);
+  transition: all 0.2s;
+}
+
+.urgencyBtnActive {
+  background-color: #eff4ff;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.formActions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.btnSecondary {
+  padding: 0.75rem 1.5rem;
+  background-color: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.btnPrimary {
+  padding: 0.75rem 2rem;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  color: white;
+}
+
+.bottomCards {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+}
+
+.safetyCard, .promoCard {
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.safetyCard {
+  background-color: #f8fafc;
+  border: 1px solid var(--border);
+}
+
+.safetyIcon {
+  color: var(--primary);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.safetyTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.safetyText {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.promoCard {
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.promoTitle {
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.promoText {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  max-width: 80%;
+  position: relative;
+  z-index: 1;
+}
+
+.promoBgIcon {
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  font-size: 10rem;
+  opacity: 0.1;
+  z-index: 0;
+}
