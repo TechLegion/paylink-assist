@@ -1,3 +1,9 @@
+import django
+import os
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
+
 from django.contrib.auth.models import User
 from core.models import UserProfile, Task, EscrowTransaction
 from decimal import Decimal
