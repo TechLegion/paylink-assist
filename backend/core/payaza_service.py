@@ -59,9 +59,9 @@ class PayazaService:
             print(f"Payaza API error: {e}")
 
         # Hackathon Fallback: If API fails or keys aren't active, mock a success response
-        # so the UI demo can continue.
+        # by redirecting directly back to the dashboard with a success param.
         return {
             "status": "mocked",
-            "checkout_url": f"https://checkout.payaza.africa/mock/{transaction_ref}",
+            "checkout_url": f"http://localhost:3000/dashboard?payment=success&ref={transaction_ref}",
             "reference": transaction_ref
         }

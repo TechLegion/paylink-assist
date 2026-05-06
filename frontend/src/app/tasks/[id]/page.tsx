@@ -25,9 +25,21 @@ export default function TaskDetailPage() {
   const color = CATEGORY_COLORS[task.category] || '#6b7280';
   const poster = task.poster_details;
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
+    if (!task) return;
     setAccepted(true);
-    setTimeout(() => router.push('/dashboard'), 1500);
+    try {
+      const { fundTask } = await import('@/lib/api');
+      const result = await fundTask(task.id);
+      if (result && result.checkout_url) {
+        window.location.href = result.checkout_url;
+      } else {
+        setTimeout(() => router.push('/dashboard'), 1500);
+      }
+    } catch (err) {
+      console.error(err);
+      setTimeout(() => router.push('/dashboard'), 1500);
+    }
   };
 
   return (

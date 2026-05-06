@@ -40,7 +40,22 @@ export interface Task {
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T | null> {
   try {
-    const res = await fetch(`${API_BASE}${path}`, { cache: 'no-store', ...options });
+    const headers: Record<string, string> = { ...((options?.headers as Record<string, string>) || {}) };
+    
+    // Only access localStorage if we're in the browser
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
+    const res = await fetch(`${API_BASE}${path}`, { 
+      cache: 'no-store', 
+      ...options,
+      headers
+    });
+    
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -52,6 +67,7 @@ export const getTasks = () => apiFetch<Task[]>('/tasks/');
 export const getTask = (id: string | number) => apiFetch<Task>(`/tasks/${id}/`);
 export const getEscrows = () => apiFetch<EscrowTransaction[]>('/escrows/');
 export const getProfiles = () => apiFetch<UserProfile[]>('/profiles/');
+export const getMe = () => apiFetch<UserProfile>('/profiles/me/');
 
 export const createTask = (data: Record<string, unknown>) =>
   apiFetch<Task>('/tasks/', {
@@ -72,6 +88,12 @@ export const updateEscrow = (id: number, data: Record<string, unknown>) =>
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
+  });
+
+export const fundTask = (id: number) =>
+  apiFetch<{ status: string, checkout_url: string, reference: string }>(`/tasks/${id}/fund_task/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
   });
 
 export function timeAgo(dateStr: string): string {

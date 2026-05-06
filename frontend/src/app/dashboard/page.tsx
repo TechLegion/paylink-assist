@@ -14,9 +14,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     Promise.all([getTasks(), getEscrows()]).then(([tasks, escrows]) => {
-      const completed = (tasks || []).find(t => t.status === 'COMPLETED');
-      setTask(completed || null);
-      const esc = (escrows || []).find(e => e.task === completed?.id);
+      // Find tasks that have an associated escrow
+      const activeTask = (tasks || []).find(t => t.status === 'COMPLETED' || t.status === 'IN_PROGRESS');
+      setTask(activeTask || null);
+      const esc = (escrows || []).find(e => e.task === activeTask?.id);
       setEscrow(esc || null);
       if (esc?.status === 'RELEASED') setReleased(true);
       setLoading(false);
@@ -29,9 +30,16 @@ export default function DashboardPage() {
     setReleased(true);
   };
 
-  const currentStep = released ? 3 : 2;
+  const getStep = () => {
+    if (released) return 3;
+    if (task?.status === 'COMPLETED') return 2;
+    if (task?.status === 'IN_PROGRESS') return 1;
+    return 0;
+  };
+
+  const currentStep = getStep();
   const serviceRate = task ? parseFloat(task.budget) * 0.025 : 0;
-  const materialReimbursement = 450;
+  const materialReimbursement = 0; // Removing the hardcoded 450
   const total = task ? parseFloat(task.budget) + materialReimbursement + serviceRate : 0;
 
   if (loading) return <div className={styles.loading}>Loading dashboard...</div>;
@@ -50,7 +58,7 @@ export default function DashboardPage() {
         <>
           <div className={styles.mainGrid}>
             <div className={styles.taskCard}>
-              <div className={styles.taskBadge}><CheckCircle2 size={14} style={{display: 'inline', verticalAlign: 'text-bottom', marginRight: '4px'}} /> TASK COMPLETED</div>
+              <div className={styles.taskBadge}><CheckCircle2 size={14} style={{display: 'inline', verticalAlign: 'text-bottom', marginRight: '4px'}} /> {task.status === 'COMPLETED' ? 'TASK COMPLETED' : 'TASK IN PROGRESS'}</div>
               <h2 className={styles.taskTitle}>{task.title}</h2>
               <p className={styles.taskDesc}>{task.description}</p>
               {task.worker_details && (

@@ -16,6 +16,13 @@ const navItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [user, setUser] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    import('@/lib/api').then(({ getMe }) => {
+      getMe().then(data => setUser(data));
+    });
+  }, []);
 
   return (
     <aside className={styles.sidebar}>
@@ -23,8 +30,8 @@ export default function Sidebar() {
       <div className={styles.userProfile}>
         <div className={styles.avatar} />
         <div className={styles.userInfo}>
-          <span className={styles.userName}>Alex Thompson</span>
-          <span className={styles.userBadge}>Verified Member</span>
+          <span className={styles.userName}>{user?.username?.replace(/_/g, ' ') || 'Loading...'}</span>
+          <span className={styles.userBadge}>{user?.is_verified ? 'Verified Member' : 'Member'}</span>
         </div>
       </div>
       <button className={styles.postButton} onClick={() => router.push('/')}>
@@ -42,7 +49,15 @@ export default function Sidebar() {
           </Link>
         ))}
       </nav>
-      <div className={styles.signOut} onClick={() => alert('Signed out!')}>
+      <div 
+        className={styles.signOut} 
+        onClick={() => {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          router.push('/login');
+        }}
+        style={{ cursor: 'pointer' }}
+      >
         <span style={{ display: 'flex', alignItems: 'center' }}><LogOut size={16} /></span> Sign Out
       </div>
     </aside>
