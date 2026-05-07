@@ -3,7 +3,7 @@ import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ShieldCheck, CheckCircle2, MessageSquare, CreditCard, Lock, Star, Clock } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { getTasks, getEscrows, updateEscrow, updateTask, getMe, Task, EscrowTransaction, verifyPayment, syncPayaza, regeneratePayment, simulatePayment } from '@/lib/api';
+import { getTasks, getEscrows, updateEscrow, updateTask, getMe, Task, UserProfile, EscrowTransaction, verifyPayment, syncPayaza, regeneratePayment, simulatePayment } from '@/lib/api';
 import TimeAgo from '@/components/TimeAgo';
 import styles from './page.module.css';
 

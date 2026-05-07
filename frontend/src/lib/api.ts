@@ -23,7 +23,7 @@ export interface EscrowTransaction {
     created_at: string;
   };
   amount: string;
-  status: 'HELD' | 'RELEASED' | 'REFUNDED' | 'DISPUTED';
+  status: 'PENDING' | 'HELD' | 'RELEASED' | 'REFUNDED' | 'DISPUTED';
   payaza_reference: string;
   payout_reference?: string | null;
   payout_status?: 'PENDING' | 'SUCCESS' | 'FAILED' | null;
@@ -61,6 +61,7 @@ export interface Task {
     transaction_reference?: string;
     expires_in_minutes?: number | string;
   };
+  completion_note?: string;
 }
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T | null> {
