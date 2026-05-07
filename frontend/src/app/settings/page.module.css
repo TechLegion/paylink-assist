@@ -11,7 +11,7 @@
 }
 
 .section {
-  background: var(--card-bg);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
@@ -24,6 +24,7 @@
   margin-bottom: 1.25rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border);
+  color: var(--text-main);
 }
 
 .formGrid {
@@ -40,13 +41,14 @@
   padding: 0.75rem 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
+  background: var(--bg-elevated);
   font-family: inherit;
   font-size: 0.95rem;
   color: var(--text-main);
   transition: border-color 0.2s;
 }
 
-.input:focus, .textarea:focus { outline: none; border-color: var(--primary); }
+.input:focus, .textarea:focus { outline: none; border-color: var(--accent); }
 .textarea { min-height: 100px; resize: vertical; width: 100%; }
 
 .toggle {
@@ -58,14 +60,14 @@
 }
 
 .toggle:last-child { border-bottom: none; }
-.toggle strong { display: block; margin-bottom: 0.25rem; }
+.toggle strong { display: block; margin-bottom: 0.25rem; color: var(--text-main); }
 .toggle p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
 
 .toggleBtn {
   padding: 0.4rem 1rem;
   border-radius: 999px;
   border: 1.5px solid var(--border);
-  background: #f3f4f6;
+  background: var(--bg-elevated);
   color: var(--text-muted);
   font-weight: 600;
   font-size: 0.8rem;
@@ -75,8 +77,8 @@
 }
 
 .toggleOn {
-  background: #10b981;
-  border-color: #10b981;
+  background: var(--accent);
+  border-color: var(--accent);
   color: white;
 }
 
@@ -84,29 +86,46 @@
 
 .outlineBtn {
   padding: 0.75rem 1.5rem;
-  border: 1.5px solid var(--primary);
+  border: 1.5px solid var(--border);
   border-radius: 8px;
-  background: white;
-  color: var(--primary);
+  background: transparent;
+  color: var(--text-main);
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
 }
 
-.outlineBtn:hover { background: #eff4ff; }
+.outlineBtn:hover { background: var(--bg-elevated); border-color: var(--text-dim); }
 
 .formActions { display: flex; justify-content: flex-end; }
 
 .saveBtn {
   padding: 0.9rem 2.5rem;
-  background: var(--primary);
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 10px;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
-.saveBtn:hover { background: var(--primary-hover); }
+.saveBtn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.saveBtn:active {
+  transform: translateY(0);
+}
+
+.saveBtn:disabled {
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

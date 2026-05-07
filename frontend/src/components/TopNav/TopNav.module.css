@@ -1,73 +1,279 @@
 .topNav {
-  height: 70px;
-  background-color: var(--card-bg);
+  height: 64px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .logo {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
-  display: flex;
-  align-items: center;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
 }
 
 .navLinks {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .navLink {
   color: var(--text-muted);
   font-weight: 500;
-  font-size: 0.95rem;
-  text-decoration: none;
-  padding: 0.5rem 0;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
 }
 
 .navLink:hover {
+  background: var(--bg-elevated);
   color: var(--text-main);
 }
 
 .activeLink {
-  color: var(--primary);
-  border-bottom: 2px solid var(--primary);
+  color: var(--text-main);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.75rem;
+}
+
+.authActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.authLink,
+.authPrimary {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.authLink {
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  background: transparent;
+}
+
+.authLink:hover {
+  color: var(--text-main);
+  background: var(--bg-elevated);
+}
+
+.authPrimary {
+  color: #020617;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.authPrimary:hover {
+  filter: brightness(1.05);
 }
 
 .iconButton {
-  background: none;
-  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
-  font-size: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: color 0.2s;
+  border: 1px solid transparent;
 }
 
 .iconButton:hover {
   color: var(--text-main);
+  background: var(--bg-elevated);
+  border-color: var(--border);
 }
 
 .avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #e2e8f0;
+  background: var(--border-light);
   cursor: pointer;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.avatar:hover {
+  border-color: var(--text-dim);
+}
+
+.notificationWrapper {
+  position: relative;
+}
+
+.iconButtonActive {
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  border-color: var(--border);
+}
+
+.badgeDot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid var(--bg-deep);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 320px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  animation: dropdownFade 0.2s ease-out;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdownHeader {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 0.875rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdownHeader button {
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.dropdownList {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.notificationItem {
+  padding: 1rem 1.25rem;
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.notificationItem:hover {
+  background: var(--bg-elevated);
+}
+
+.notificationIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notificationContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.notificationContent strong {
+  font-size: 0.875rem;
+  color: var(--text-main);
+}
+
+.notificationContent p {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.notificationContent span {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.dropdownFooter {
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .topNav {
+    height: auto;
+    min-height: 64px;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .navLinks {
+    order: 3;
+    width: 100%;
+    gap: 0.5rem;
+    overflow-x: auto;
+  }
+
+  .actions {
+    gap: 0.5rem;
+  }
+
+  .authActions span {
+    display: none;
+  }
+  
+  .dropdown {
+    position: fixed;
+    top: 64px;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+  }
 }

@@ -3,15 +3,46 @@ import React, { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import styles from './page.module.css';
 
+import { AUTH_CHANGED_EVENT, getMe, updateProfile, UserProfile } from '@/lib/api';
+
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState({ name: 'Alex Thompson', email: 'alex@example.com', bio: '', notifications: true, escrowAlerts: true });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [form, setForm] = useState({ name: '', bio: '', notifications: true, escrowAlerts: true });
 
-  const handleSave = (e: React.FormEvent) => {
+  React.useEffect(() => {
+    getMe().then(data => {
+      if (data) {
+        setUser(data);
+        setForm(f => ({ ...f, name: data.username, bio: data.bio || '' }));
+      }
+      setLoading(false);
+    });
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    if (!user || saving) return;
+
+    setSaving(true);
+    const res = await updateProfile(user.id, {
+      username: form.name,
+      bio: form.bio,
+    });
+
+    setSaving(false);
+    if (res) {
+      setSaved(true);
+      window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+      setTimeout(() => setSaved(false), 3000);
+    } else {
+      alert("Failed to update profile. Please try again.");
+    }
   };
+
+  if (loading) return <div className={styles.page}>Loading settings...</div>;
 
   return (
     <div className={styles.page}>
@@ -24,12 +55,12 @@ export default function SettingsPage() {
           <h2 className={styles.sectionTitle}>Profile</h2>
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Full Name</label>
+              <label className={styles.label}>Username</label>
               <input className={styles.input} value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Email</label>
-              <input className={styles.input} type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+              <label className={styles.label}>Email (Read-only)</label>
+              <input className={styles.input} type="email" value={user?.email || ''} readOnly style={{ opacity: 0.6, cursor: 'not-allowed' }} />
             </div>
           </div>
           <div className={styles.formGroup}>
@@ -67,7 +98,9 @@ export default function SettingsPage() {
         </div>
 
         <div className={styles.formActions}>
-          <button type="submit" className={styles.saveBtn}>Save Changes</button>
+          <button type="submit" className={styles.saveBtn} disabled={saving}>
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
         </div>
       </form>
     </div>

@@ -2,11 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MapPin, Clock, CheckCircle2, LayoutGrid, Map as MapIcon, Filter } from 'lucide-react';
-import { getTasks, Task, CATEGORY_COLORS, timeAgo } from '@/lib/api';
+import { getTasks, Task, CATEGORY_COLORS } from '@/lib/api';
+import TimeAgo from '@/components/TimeAgo';
 import TaskMap from '@/components/TaskMap/TaskMap';
 import styles from './page.module.css';
 
-const FILTERS = ['All', 'Delivery', 'Maintenance', 'Moving', 'Cleaning', 'Assembly'];
+const FILTERS = ['All', 'Assembly', 'Cleaning', 'Delivery', 'Maintenance', 'Moving', 'Plumbing', 'Electrical', 'Tutoring', 'Assistant', 'Garden', 'Repair', 'Technology'];
 
 export default function BrowsePage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -78,7 +79,7 @@ export default function BrowsePage() {
                     {task.category.toUpperCase()}
                   </span>
                   <div className={styles.budgetBlock}>
-                    <span className={styles.budget}>${parseFloat(task.budget).toFixed(2)}</span>
+                    <span className={styles.budget}>₦{parseFloat(task.budget).toFixed(2)}</span>
                     <span className={styles.budgetLabel}>Fixed Price</span>
                   </div>
                 </div>
@@ -86,7 +87,7 @@ export default function BrowsePage() {
                 <p className={styles.taskDesc}>{task.description.slice(0, 100)}...</p>
                 <div className={styles.taskMeta}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={14} /> {task.location || '—'}</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> {timeAgo(task.created_at)}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> <TimeAgo date={task.created_at} /></span>
                 </div>
                 <div className={styles.cardFooter}>
                   <div className={styles.posterInfo}>

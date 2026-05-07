@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import TopNav from "@/components/TopNav/TopNav";
-import Sidebar from "@/components/Sidebar/Sidebar";
-import styles from "./layout.module.css";
+import MainLayout from "@/components/MainLayout";
 
 export const metadata: Metadata = {
   title: "PayLink Assist",
@@ -16,14 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={styles.appContainer}>
-        <TopNav />
-        <div className={styles.mainWrapper}>
-          <Sidebar />
-          <main className={styles.pageContainer}>
-            {children}
-          </main>
-        </div>
+      <body>
+        <MainLayout>
+          {children}
+        </MainLayout>
       </body>
     </html>
   );

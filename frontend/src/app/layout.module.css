@@ -18,3 +18,15 @@
   overflow-y: auto;
   background-color: var(--background);
 }
+
+.publicPageContainer {
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.authContainer {
+  min-height: 100vh;
+  width: 100vw;
+  background-color: var(--background);
+}

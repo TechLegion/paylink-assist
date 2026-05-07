@@ -1,20 +1,25 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ShieldCheck, MapPin, Clock, MessageSquare, CheckCircle2, Shield, Star } from 'lucide-react';
-import { getTask, Task, CATEGORY_COLORS, timeAgo } from '@/lib/api';
+import { ShieldCheck, MapPin, Clock, MessageSquare, CheckCircle2, Star } from 'lucide-react';
+import { getMe, getTask, isAuthenticated, Task, CATEGORY_COLORS, timeAgo, UserProfile } from '@/lib/api';
 import styles from './page.module.css';
 
 export default function TaskDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [task, setTask] = useState<Task | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [accepted, setAccepted] = useState(false);
 
   useEffect(() => {
-    getTask(id).then(data => {
-      setTask(data);
+    Promise.all([
+      getTask(id),
+      isAuthenticated() ? getMe() : Promise.resolve(null),
+    ]).then(([taskData, userData]) => {
+      setTask(taskData);
+      setUser(userData);
       setLoading(false);
     });
   }, [id]);
@@ -24,16 +29,20 @@ export default function TaskDetailPage() {
 
   const color = CATEGORY_COLORS[task.category] || '#6b7280';
   const poster = task.poster_details;
+  const isOwnTask = Boolean(user && task.poster === user.id);
 
   const handleAccept = async () => {
     if (!task) return;
+    if (!isAuthenticated()) {
+      router.push('/login');
+      return;
+    }
+    if (isOwnTask) return;
     setAccepted(true);
     try {
-      const { fundTask } = await import('@/lib/api');
-      const result = await fundTask(task.id);
-      if (result && result.checkout_url) {
-        window.location.href = result.checkout_url;
-      } else {
+      const { acceptTask } = await import('@/lib/api');
+      const result = await acceptTask(task.id);
+      if (result) {
         setTimeout(() => router.push('/dashboard'), 1500);
       }
     } catch (err) {
@@ -45,10 +54,16 @@ export default function TaskDetailPage() {
   return (
     <div className={styles.page}>
       <div className={styles.escrowBanner}>
-        <span className={styles.escrowIcon}><ShieldCheck size={28} /></span>
+        <span className={styles.escrowIcon}>
+          {task.status === 'PENDING_PAYMENT' ? <Clock size={28} color="#f59e0b" /> : <ShieldCheck size={28} color="#10b981" />}
+        </span>
         <div>
-          <strong>ESCROW PROTECTION ACTIVE</strong>
-          <p>Your payment is held securely in escrow and only released once you are 100% satisfied with the task completion.</p>
+          <strong>{task.status === 'PENDING_PAYMENT' ? 'PAYMENT PENDING' : 'ESCROW PROTECTION ACTIVE'}</strong>
+          <p>
+            {task.status === 'PENDING_PAYMENT' 
+              ? 'Waiting for funds to be secured via Payaza. The task will be open for helpers once payment is verified.'
+              : 'Your payment is held securely in escrow and only released once you are 100% satisfied with the task completion.'}
+          </p>
         </div>
       </div>
 
@@ -59,7 +74,7 @@ export default function TaskDetailPage() {
               <span className={styles.badge} style={{ background: color + '20', color }}>Active Listing</span>
               <div className={styles.budget}>
                 <span className={styles.budgetLabel}>ESTIMATED BUDGET</span>
-                <span className={styles.budgetAmount}>${parseFloat(task.budget).toFixed(2)}</span>
+                <span className={styles.budgetAmount}>₦{parseFloat(task.budget).toFixed(2)}</span>
               </div>
             </div>
             <h1 className={styles.title}>{task.title}</h1>
@@ -85,11 +100,22 @@ export default function TaskDetailPage() {
           <div className={styles.card}>
             {accepted ? (
               <div className={styles.acceptedMsg}><CheckCircle2 size={20} style={{ display: 'inline', verticalAlign: 'text-bottom' }} /> Task Accepted! Redirecting to Dashboard...</div>
+            ) : isOwnTask ? (
+              <div className={styles.ownerNotice}>
+                <CheckCircle2 size={20} />
+                <strong>This is your task</strong>
+                <p>
+                  {task.status === 'PENDING_PAYMENT' 
+                    ? 'Payment is currently being processed via Payaza.' 
+                    : 'You funded this task with Payaza.'} 
+                  Track payment and completion from your dashboard.
+                </p>
+              </div>
             ) : (
               <>
-                <button className={styles.acceptBtn} onClick={handleAccept}>Accept Task</button>
+                <button className={styles.acceptBtn} onClick={handleAccept}>{isAuthenticated() ? 'Accept Task' : 'Sign in to Accept'}</button>
                 <button className={styles.messageBtn}><MessageSquare size={16} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: '4px' }} /> Message Poster</button>
-                <p className={styles.acceptNote}>By clicking 'Accept', you agree to the community guidelines and PayLink's secure payment terms.</p>
+                <p className={styles.acceptNote}>By clicking &apos;Accept&apos;, you agree to the community guidelines and PayLink&apos;s secure payment terms.</p>
               </>
             )}
           </div>

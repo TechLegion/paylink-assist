@@ -19,6 +19,7 @@ class Task(models.Model):
     ]
     
     STATUS_CHOICES = [
+        ('PENDING_PAYMENT', 'Pending Payment'),
         ('OPEN', 'Open'),
         ('IN_PROGRESS', 'In Progress'),
         ('COMPLETED', 'Completed'),
@@ -35,7 +36,8 @@ class Task(models.Model):
     poster = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='posted_tasks')
     worker = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_tasks')
     
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='OPEN')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING_PAYMENT')
+    completion_note = models.TextField(blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -45,6 +47,7 @@ class Task(models.Model):
 
 class EscrowTransaction(models.Model):
     STATUS_CHOICES = [
+        ('PENDING', 'Payment Pending'),
         ('HELD', 'Held in Escrow'),
         ('RELEASED', 'Released to Worker'),
         ('REFUNDED', 'Refunded to Poster'),
@@ -53,9 +56,22 @@ class EscrowTransaction(models.Model):
 
     task = models.OneToOneField(Task, on_delete=models.CASCADE, related_name='escrow')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='HELD')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     
     payaza_reference = models.CharField(max_length=100, blank=True, null=True)
+
+    # Payaza payout tracking (verification is done by calling Payaza transaction status endpoints).
+    payout_reference = models.CharField(max_length=100, blank=True, null=True)
+    payout_status = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        default='PENDING',
+    )
+    payaza_payment_check_response = models.JSONField(blank=True, null=True)
+    payaza_payout_check_response = models.JSONField(blank=True, null=True)
+    payaza_last_payment_check = models.DateTimeField(blank=True, null=True)
+    payaza_last_payout_check = models.DateTimeField(blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

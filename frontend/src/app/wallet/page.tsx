@@ -1,62 +1,136 @@
 "use client";
-import React, { useState } from 'react';
-import { Lock, ShieldCheck } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Wallet, ArrowUpRight, ArrowDownLeft, Shield, Clock, CheckCircle2, CreditCard } from 'lucide-react';
+import { getWalletStats, EscrowTransaction, isAuthenticated } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import TimeAgo from '@/components/TimeAgo';
 import styles from './page.module.css';
 
-const transactions = [
-  { id: 1, type: 'Deposit', desc: 'Task: Help Moving Furniture', amount: '+$120.00', date: 'May 3, 2026', color: '#10b981' },
-  { id: 2, type: 'Withdrawal', desc: 'Payment released to Julian', amount: '-$1,691.25', date: 'Apr 28, 2026', color: '#ef4444' },
-  { id: 3, type: 'Deposit', desc: 'Escrow funded: Garden Landscaping', amount: '+$1,200.00', date: 'Apr 20, 2026', color: '#10b981' },
-  { id: 4, type: 'Refund', desc: 'Task cancelled: IKEA Assembly', amount: '+$65.00', date: 'Apr 15, 2026', color: '#f59e0b' },
-];
-
 export default function WalletPage() {
-  const [tab, setTab] = useState<'balance' | 'transactions'>('balance');
+  const [stats, setStats] = useState<{
+    active_escrow: number;
+    pending_earnings: number;
+    total_balance: number;
+    transactions: EscrowTransaction[];
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.push('/login');
+      return;
+    }
+
+    getWalletStats().then(data => {
+      setStats(data);
+      setLoading(false);
+    });
+  }, [router]);
+
+  if (loading) return <div className={styles.loading}>Loading wallet...</div>;
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Wallet</h1>
+      <header className={styles.header}>
+        <div className={styles.titleGroup}>
+          <Wallet className={styles.titleIcon} size={32} />
+          <div>
+            <h1 className={styles.title}>Your Wallet</h1>
+            <p className={styles.subtitle}>Manage your escrowed funds and earnings secured by Payaza.</p>
+          </div>
+        </div>
+        <button className={styles.withdrawBtn}>
+          <ArrowUpRight size={18} />
+          Withdraw Funds
+        </button>
+      </header>
 
-      <div className={styles.balanceCard}>
-        <div className={styles.balanceLabel}>Available Balance</div>
-        <div className={styles.balanceAmount}>$384.75</div>
-        <div className={styles.escrowNote}><Lock size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} /> $1,691.25 held in escrow</div>
-        <div className={styles.walletActions}>
-          <button className={styles.primaryBtn} onClick={() => alert('Top up coming soon!')}>+ Add Funds</button>
-          <button className={styles.secondaryBtn} onClick={() => alert('Withdrawal coming soon!')}>Withdraw</button>
+      <div className={styles.statsGrid}>
+        <div className={`${styles.statCard} ${styles.primaryCard}`}>
+          <div className={styles.statInfo}>
+            <span>TOTAL BALANCE</span>
+            <h2>₦{stats?.total_balance.toLocaleString()}</h2>
+            <p>Available for withdrawal</p>
+          </div>
+          <CreditCard className={styles.cardIcon} size={48} />
+        </div>
+
+        <div className={styles.statCard}>
+          <div className={styles.statInfo}>
+            <span>ACTIVE ESCROW</span>
+            <h2>₦{stats?.active_escrow.toLocaleString()}</h2>
+            <p>Funds locked in tasks you posted</p>
+          </div>
+          <Shield className={styles.cardIcon} size={48} color="var(--accent)" />
+        </div>
+
+        <div className={styles.statCard}>
+          <div className={styles.statInfo}>
+            <span>PENDING EARNINGS</span>
+            <h2>₦{stats?.pending_earnings.toLocaleString()}</h2>
+            <p>Awaiting release from posters</p>
+          </div>
+          <Clock className={styles.cardIcon} size={48} color="#f59e0b" />
         </div>
       </div>
 
-      <div className={styles.tabs}>
-        <button className={`${styles.tab} ${tab === 'balance' ? styles.tabActive : ''}`} onClick={() => setTab('balance')}>Overview</button>
-        <button className={`${styles.tab} ${tab === 'transactions' ? styles.tabActive : ''}`} onClick={() => setTab('transactions')}>Transactions</button>
-      </div>
-
-      {tab === 'balance' && (
-        <div className={styles.overviewGrid}>
-          <div className={styles.overviewCard}><span className={styles.ocLabel}>Total Deposited</span><span className={styles.ocValue}>$2,450.00</span></div>
-          <div className={styles.overviewCard}><span className={styles.ocLabel}>Total Withdrawn</span><span className={styles.ocValue}>$1,691.25</span></div>
-          <div className={styles.overviewCard}><span className={styles.ocLabel}>In Escrow</span><span className={styles.ocValue}>$1,691.25</span></div>
-          <div className={styles.overviewCard}><span className={styles.ocLabel}>Payaza Protected</span><span className={styles.ocValue} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>100% <ShieldCheck size={20} color="#10b981" /></span></div>
+      <section className={styles.transactionsSection}>
+        <h3 className={styles.sectionTitle}>Recent Transactions</h3>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Task</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats?.transactions.map(tx => (
+                <tr key={tx.id}>
+                  <td>
+                    <div className={styles.dateCell}>
+                      <TimeAgo date={tx.created_at} />
+                      <span>{new Date(tx.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className={styles.taskCell}>
+                      <strong>{tx.task_details?.title}</strong>
+                      <span>{tx.task_details?.category}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={styles.typeTag}>
+                      {tx.status === 'RELEASED' ? <ArrowDownLeft size={14} color="#10b981" /> : <Shield size={14} />}
+                      {tx.status === 'RELEASED' ? 'Payout' : 'Escrow'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={styles.amount}>₦{parseFloat(tx.amount).toLocaleString()}</span>
+                  </td>
+                  <td>
+                    <span className={`${styles.statusBadge} ${styles['status' + tx.status]}`}>
+                      {tx.status === 'HELD' && 'Held'}
+                      {tx.status === 'RELEASED' && 'Completed'}
+                      {tx.status === 'PENDING' && 'Pending'}
+                      {tx.status === 'REFUNDED' && 'Refunded'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {(!stats?.transactions || stats.transactions.length === 0) && (
+                <tr>
+                  <td colSpan={5} className={styles.empty}>No transactions found yet.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
-
-      {tab === 'transactions' && (
-        <div className={styles.txList}>
-          {transactions.map(tx => (
-            <div key={tx.id} className={styles.txRow}>
-              <div>
-                <strong>{tx.type}</strong>
-                <span className={styles.txDesc}>{tx.desc}</span>
-              </div>
-              <div className={styles.txRight}>
-                <span style={{ color: tx.color, fontWeight: 700 }}>{tx.amount}</span>
-                <span className={styles.txDate}>{tx.date}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      </section>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Shield, FileText, MapPin, DollarSign, Zap, CheckCircle2 } from 'lucide-react';
+import { Shield, FileText, MapPin, DollarSign, Zap } from 'lucide-react';
+import { getMe, isAuthenticated, UserProfile } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -11,9 +13,38 @@ export default function Home() {
     category: 'Furniture Assembly',
     urgency: 'LOW',
     budget: '',
+    location: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [virtualAccount, setVirtualAccount] = useState<{
+    account_name?: string;
+    account_number?: string;
+    bank_name?: string;
+    transaction_amount_payable?: number | string;
+    transaction_reference?: string;
+    expires_in_minutes?: number | string;
+  } | null>(null);
+  const [user, setUser] = React.useState<UserProfile | null>(null);
+  const router = useRouter();
+  const payazaRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (success && payazaRef.current) {
+      payazaRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [success]);
+
+  React.useEffect(() => {
+    if (!isAuthenticated()) {
+      return;
+    }
+
+    getMe().then(data => {
+      setUser(data);
+    });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -31,36 +62,59 @@ export default function Home() {
     setIsSubmitting(true);
     
     try {
-      // Send poster ID 1 (our dummy profile)
+      if (!user) {
+        alert("Please login to post a task.");
+        router.push('/login');
+        return;
+      }
+
+      if (!formData.budget || parseFloat(formData.budget) <= 0) {
+        alert("Please enter a valid budget greater than 0.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Send actual user profile ID
       const payload = {
         ...formData,
-        poster: 1, 
+        poster: user.id, 
       };
 
-      const response = await fetch('http://localhost:8000/api/tasks/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+      const { createTask } = await import('@/lib/api');
+      const data = await createTask(payload);
 
-      if (response.ok) {
+      if (data) {
         setSuccess(true);
+        setPaymentStatus(
+          data.payaza_reference
+            ? `Payaza ${data.payment_status || 'PENDING'} - Ref ${data.payaza_reference}`
+            : data.payment_warning || null
+        );
+        setVirtualAccount(data.virtual_account || null);
         setFormData({
           title: '',
           description: '',
           category: 'Furniture Assembly',
           urgency: 'LOW',
           budget: '',
+          location: '',
         });
-        setTimeout(() => setSuccess(false), 3000);
-      } else {
-        console.error("Failed to create task", await response.json());
-        alert("Error creating task. Check console.");
+        
+        // Redirect to Payaza if checkout_url is provided
+        if (data.checkout_url) {
+          setTimeout(() => {
+            window.location.href = data.checkout_url!;
+          }, 1500);
+        } else {
+          setTimeout(() => {
+            setSuccess(false);
+            setPaymentStatus(null);
+          }, data.virtual_account ? 30000 : 6000);
+        }
       }
     } catch (error) {
       console.error("Network error:", error);
+      alert(error instanceof Error ? error.message : "Payaza payment could not be initialized, so the task was not created.");
     } finally {
       setIsSubmitting(false);
     }
@@ -69,14 +123,69 @@ export default function Home() {
   return (
     <>
       {success && (
-        <div style={{ backgroundColor: '#10b981', color: 'white', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <CheckCircle2 size={20} /> Task created successfully and saved to Django!
+        <div className={styles.payazaPanel} ref={payazaRef}>
+          <div className={styles.payazaHeader}>
+            <div className={styles.payazaMark}>P</div>
+            <div>
+              <h2 className={styles.payazaTitle}>Payaza payment account</h2>
+              <p className={styles.payazaSubtitle}>{paymentStatus || 'Payment pending'}</p>
+            </div>
+          </div>
+          {virtualAccount && (
+            <div className={styles.payazaDetails}>
+              <div>
+                <span>Bank</span>
+                <strong>{virtualAccount.bank_name}</strong>
+              </div>
+              <div>
+                <span>Account number</span>
+                <strong>{virtualAccount.account_number}</strong>
+              </div>
+              <div>
+                <span>Account name</span>
+                <strong>{virtualAccount.account_name}</strong>
+              </div>
+              <div>
+                <span>Amount</span>
+                <strong>{virtualAccount.transaction_amount_payable}</strong>
+              </div>
+              <div>
+                <span>Reference</span>
+                <strong>{virtualAccount.transaction_reference}</strong>
+              </div>
+              <div>
+                <span>Expires</span>
+                <strong>{virtualAccount.expires_in_minutes} minutes</strong>
+              </div>
+            </div>
+          )}
+          <div className={styles.payazaActions}>
+            <button
+              type="button"
+              className={styles.btnSecondary}
+              onClick={() => {
+                const details = [
+                  `Bank: ${virtualAccount?.bank_name || ''}`,
+                  `Account: ${virtualAccount?.account_number || ''}`,
+                  `Name: ${virtualAccount?.account_name || ''}`,
+                  `Amount: ${virtualAccount?.transaction_amount_payable || ''}`,
+                  `Reference: ${virtualAccount?.transaction_reference || ''}`,
+                ].join('\n');
+                navigator.clipboard?.writeText(details);
+              }}
+            >
+              Copy details
+            </button>
+            <button type="button" className={styles.btnPrimary} onClick={() => router.push('/dashboard')}>
+              Go to Dashboard
+            </button>
+          </div>
         </div>
       )}
 
       <div className={styles.securityBanner}>
         <Shield size={20} />
-        <span>Your payments are secured via PayLink Escrow. Funds are only released when you're satisfied.</span>
+        <span>Your payments are secured via PayLink Escrow. Funds are only released when you&apos;re satisfied.</span>
       </div>
 
       <div className={styles.stepper}>
@@ -138,6 +247,13 @@ export default function Home() {
                   <option value="Furniture Assembly">Furniture Assembly</option>
                   <option value="Moving Help">Moving Help</option>
                   <option value="Cleaning">Cleaning</option>
+                  <option value="Plumbing">Plumbing</option>
+                  <option value="Electrical">Electrical</option>
+                  <option value="Tutoring">Tutoring</option>
+                  <option value="Personal Assistant">Personal Assistant</option>
+                  <option value="Garden Help">Garden Help</option>
+                  <option value="Car Repair">Car Repair</option>
+                  <option value="Technology Help">Technology Help</option>
                 </select>
               </div>
             </div>
@@ -153,7 +269,7 @@ export default function Home() {
             </div>
             <div className={styles.col}>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Budget ($)</label>
+                <label className={styles.formLabel}>Budget (₦)</label>
                 <input 
                   type="number" 
                   name="budget"
@@ -161,6 +277,20 @@ export default function Home() {
                   onChange={handleChange}
                   className={styles.input} 
                   placeholder="e.g. 150" 
+                  required
+                />
+              </div>
+            </div>
+            <div className={styles.col}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Location</label>
+                <input 
+                  type="text" 
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  className={styles.input} 
+                  placeholder="e.g. Lagos Island" 
                   required
                 />
               </div>

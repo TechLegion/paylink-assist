@@ -1,106 +1,250 @@
-.page { padding-bottom: 3rem; }
-.title { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; }
-
-.balanceCard {
-  background: linear-gradient(135deg, var(--primary), #1e40af);
-  border-radius: 16px;
+.page {
   padding: 2.5rem;
-  color: white;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 24px rgba(18, 79, 212, 0.3);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.balanceLabel { font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.5rem; }
-.balanceAmount { font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem; }
-.escrowNote { font-size: 0.85rem; opacity: 0.8; margin-bottom: 2rem; }
-
-.walletActions { display: flex; gap: 1rem; }
-
-.primaryBtn {
-  padding: 0.75rem 2rem;
-  background: white;
-  color: var(--primary);
-  border: none;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.primaryBtn:hover { opacity: 0.9; }
-
-.secondaryBtn {
-  padding: 0.75rem 2rem;
-  background: rgba(255,255,255,0.15);
-  color: white;
-  border: 1.5px solid rgba(255,255,255,0.4);
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.secondaryBtn:hover { background: rgba(255,255,255,0.25); }
-
-.tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 2px solid var(--border);
-  margin-bottom: 1.5rem;
-}
-
-.tab {
-  padding: 0.75rem 1.5rem;
-  background: none;
-  border: none;
-  font-weight: 500;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  transition: all 0.2s;
-}
-
-.tabActive {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-  font-weight: 600;
-}
-
-.overviewGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-
-.overviewCard {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.ocLabel { font-size: 0.85rem; color: var(--text-muted); }
-.ocValue { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
-
-.txList { display: flex; flex-direction: column; gap: 0.75rem; }
-
-.txRow {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem 1.5rem;
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 3rem;
 }
 
-.txRow strong { display: block; margin-bottom: 0.25rem; }
-.txDesc { font-size: 0.85rem; color: var(--text-muted); }
-.txRight { text-align: right; }
-.txDate { display: block; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.titleIcon {
+  color: var(--accent);
+  background: var(--bg-elevated);
+  padding: 0.75rem;
+  border-radius: var(--radius-lg);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  color: var(--text-dim);
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9375rem;
+}
+
+.withdrawBtn {
+  background: var(--text-main);
+  color: var(--bg-deep);
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+}
+
+.withdrawBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+
+.statCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.statCard:hover {
+  border-color: var(--border-light);
+  transform: translateY(-4px);
+}
+
+.primaryCard {
+  background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-surface) 100%);
+  border-color: var(--accent);
+}
+
+.statInfo span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+.statInfo h2 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.statInfo p {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.cardIcon {
+  opacity: 0.15;
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  transform: rotate(-15deg);
+}
+
+.transactionsSection {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.sectionTitle {
+  padding: 1.5rem 2rem;
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  padding: 1rem 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table td {
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.dateCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.dateCell strong {
+  font-size: 0.875rem;
+  color: var(--text-main);
+}
+
+.dateCell span {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.taskCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.taskCell strong {
+  font-size: 0.875rem;
+  color: var(--text-main);
+}
+
+.taskCell span {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.typeTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+.amount {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.statusBadge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.statusHELD {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.statusRELEASED {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.statusPENDING {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.statusREFUNDED {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.empty {
+  text-align: center;
+  padding: 4rem !important;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+@media (max-width: 900px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}

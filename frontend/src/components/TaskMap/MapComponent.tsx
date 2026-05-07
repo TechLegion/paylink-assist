@@ -59,7 +59,7 @@ export default function MapComponent({ tasks }: MapProps) {
             <Marker key={task.id} position={coords}>
               <Popup>
                 <h4 className={styles.popupTitle}>{task.title}</h4>
-                <p className={styles.popupBudget}>${parseFloat(task.budget).toFixed(2)}</p>
+                <p className={styles.popupBudget}>₦{parseFloat(task.budget).toFixed(2)}</p>
                 <Link href={`/tasks/${task.id}`} className={styles.popupLink}>
                   View Task
                 </Link>
