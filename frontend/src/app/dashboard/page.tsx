@@ -21,19 +21,15 @@ function DashboardContent() {
   const [justCompleted, setJustCompleted] = useState(false);
   const [completionNote, setCompletionNote] = useState('');
 
-  const selectedTaskIdRef = React.useRef<number | null>(null);
+  const [allEscrows, setAllEscrows] = useState<EscrowTransaction[]>([]);
 
+  // fetchData ONLY loads raw data — it does NOT decide which task to show
   const fetchData = useCallback(async () => {
-    const [meProfile, allTasks, allEscrows] = await Promise.all([getMe(), getTasks(), getEscrows()]);
-    if (!meProfile) {
-      setLoading(false);
-      return;
-    }
+    const [meProfile, allTasks, escrows] = await Promise.all([getMe(), getTasks(), getEscrows()]);
+    if (!meProfile) { setLoading(false); return; }
     setMe(meProfile);
 
     const myTasks = (allTasks || []).filter(t => t.poster === meProfile.id || t.worker === meProfile.id);
-    
-    // Sort: Tasks I'm doing first, then tasks I posted
     myTasks.sort((a, b) => {
       const aIsWorker = a.worker === meProfile.id;
       const bIsWorker = b.worker === meProfile.id;
@@ -41,48 +37,41 @@ function DashboardContent() {
       if (!aIsWorker && bIsWorker) return 1;
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
-    
+
     setTasks(myTasks);
+    setAllEscrows(escrows || []);
 
-    // Use the ref to read selectedTaskId without it being a dependency
-    const currentSelectedId = selectedTaskIdRef.current;
-    const activeTask = currentSelectedId 
-      ? myTasks.find(t => t.id === currentSelectedId) || myTasks[0]
-      : myTasks[0];
+    // Only set default task on first load (when nothing is selected)
+    setSelectedTaskId(prev => {
+      if (prev !== null) return prev; // already selected — don't change
+      return myTasks[0]?.id ?? null;
+    });
 
-    if (activeTask) {
-      // Only update selectedTaskId if it isn't already set to avoid the loop
-      if (!currentSelectedId) {
-        selectedTaskIdRef.current = activeTask.id;
-        setSelectedTaskId(activeTask.id);
-      }
-      const activeEscrow = (allEscrows || []).find(e => e.task === activeTask.id);
-      setTask(activeTask);
-      setEscrow(activeEscrow || null);
-      setReleased(activeEscrow?.status === 'RELEASED');
-    } else {
-      setTask(null);
-      setEscrow(null);
-    }
-    
     setLoading(false);
-  }, []); // No dependencies — reads selectedTaskId via ref
+  }, []);
+
+  // Whenever selectedTaskId changes, update the displayed task & escrow
+  useEffect(() => {
+    if (selectedTaskId === null) return;
+    const t = tasks.find(t => t.id === selectedTaskId) ?? null;
+    const e = allEscrows.find(e => e.task === selectedTaskId) ?? null;
+    setTask(t);
+    setEscrow(e);
+    setReleased(e?.status === 'RELEASED');
+  }, [selectedTaskId, tasks, allEscrows]);
 
   useEffect(() => {
     const taskId = searchParams.get('task_id');
     const paymentStatus = searchParams.get('payment');
-
     queueMicrotask(() => {
       if (taskId && paymentStatus === 'success') {
         const id = parseInt(taskId);
         if (!isNaN(id)) {
-          selectedTaskIdRef.current = id;
           setSelectedTaskId(id);
           verifyPayment(id).then(fetchData);
           return;
         }
       }
-
       fetchData();
     });
   }, [fetchData, searchParams]);
