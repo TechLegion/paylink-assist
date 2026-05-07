@@ -119,7 +119,10 @@ function DashboardContent() {
   const handleRelease = async () => {
     if (!escrow) return;
     const res = await updateEscrow(escrow.id, { status: 'RELEASED' });
-    if (res) setReleased(true);
+    if (res) {
+      setReleased(true);
+      await fetchData(); // reload escrow so payout_status = SUCCESS is reflected
+    }
   };
 
   const handleVerify = async () => {
@@ -161,7 +164,7 @@ function DashboardContent() {
   };
 
   const getStep = () => {
-    if (released) return escrow?.payout_status === 'SUCCESS' ? 3 : 2;
+    if (released) return 3; // always jump to Funds Disbursed when released
     if (task?.status === 'COMPLETED') return 2;
     if (task?.status === 'IN_PROGRESS') return 1;
     if (task?.status === 'OPEN') return 0;
