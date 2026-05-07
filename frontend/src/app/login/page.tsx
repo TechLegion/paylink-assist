@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, ShieldCheck } from 'lucide-react';
 import styles from './page.module.css';
-import { storeTokens } from '@/lib/api';
+import { storeTokens, API_BASE } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function LoginPage() {
     setLoading(true);
     
     try {
-      const res = await fetch('http://localhost:8000/api/token/', {
+      const res = await fetch(`${API_BASE}/token/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: email, password: password }) // Using email as username for simplicity

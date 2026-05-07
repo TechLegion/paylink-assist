@@ -14,7 +14,7 @@ SECRET_KEY = "django-insecure-lpp!9&63=uuj!@aj8-0u&d(v=t)tgl56h0ec+&6_=x#f22d!rv
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'backend-production-e0c6.up.railway.app']
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -73,9 +73,15 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 import dj_database_url
+database_url = os.getenv("DATABASE_URL")
+if not database_url:
+    print("WARNING: DATABASE_URL not found in environment, falling back to local default.")
+
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgres://postgres:sammyokay@localhost:5432/paylink"
+        default="postgres://postgres:sammyokay@localhost:5432/paylink",
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 }
 

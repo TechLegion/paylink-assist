@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-e0c6.up.railway.app/api';
 export const AUTH_CHANGED_EVENT = 'paylink-auth-changed';
 
 export interface UserProfile {

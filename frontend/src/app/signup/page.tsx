@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, ShieldCheck } from 'lucide-react';
 import styles from '../login/page.module.css'; // Reusing login styles
-import { storeTokens } from '@/lib/api';
+import { storeTokens, API_BASE } from '@/lib/api';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function SignupPage() {
     
     try {
       // 1. Register User
-      const regRes = await fetch('http://localhost:8000/api/register/', {
+      const regRes = await fetch(`${API_BASE}/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -38,7 +38,7 @@ export default function SignupPage() {
       }
 
       // 2. Automatically Login
-      const loginRes = await fetch('http://localhost:8000/api/token/', {
+      const loginRes = await fetch(`${API_BASE}/token/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: email, password: password })
