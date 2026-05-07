@@ -21,6 +21,8 @@ function DashboardContent() {
   const [justCompleted, setJustCompleted] = useState(false);
   const [completionNote, setCompletionNote] = useState('');
 
+  const selectedTaskIdRef = React.useRef<number | null>(null);
+
   const fetchData = useCallback(async () => {
     const [meProfile, allTasks, allEscrows] = await Promise.all([getMe(), getTasks(), getEscrows()]);
     if (!meProfile) {
@@ -42,13 +44,18 @@ function DashboardContent() {
     
     setTasks(myTasks);
 
-    // Pick a default task if none selected (following the sorted priority)
-    const activeTask = selectedTaskId 
-      ? myTasks.find(t => t.id === selectedTaskId) || myTasks[0]
+    // Use the ref to read selectedTaskId without it being a dependency
+    const currentSelectedId = selectedTaskIdRef.current;
+    const activeTask = currentSelectedId 
+      ? myTasks.find(t => t.id === currentSelectedId) || myTasks[0]
       : myTasks[0];
 
     if (activeTask) {
-      setSelectedTaskId(activeTask.id);
+      // Only update selectedTaskId if it isn't already set to avoid the loop
+      if (!currentSelectedId) {
+        selectedTaskIdRef.current = activeTask.id;
+        setSelectedTaskId(activeTask.id);
+      }
       const activeEscrow = (allEscrows || []).find(e => e.task === activeTask.id);
       setTask(activeTask);
       setEscrow(activeEscrow || null);
@@ -59,7 +66,7 @@ function DashboardContent() {
     }
     
     setLoading(false);
-  }, [selectedTaskId]);
+  }, []); // No dependencies — reads selectedTaskId via ref
 
   useEffect(() => {
     const taskId = searchParams.get('task_id');
@@ -69,6 +76,7 @@ function DashboardContent() {
       if (taskId && paymentStatus === 'success') {
         const id = parseInt(taskId);
         if (!isNaN(id)) {
+          selectedTaskIdRef.current = id;
           setSelectedTaskId(id);
           verifyPayment(id).then(fetchData);
           return;
