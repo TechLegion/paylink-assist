@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import MainLayout from "@/components/MainLayout";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "PayLink Assist",
@@ -13,11 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
-        <MainLayout>
-          {children}
-        </MainLayout>
+        <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
+          <MainLayout>
+            {children}
+          </MainLayout>
+        </ThemeProvider>
       </body>
     </html>
   );

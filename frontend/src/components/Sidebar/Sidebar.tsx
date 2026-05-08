@@ -14,7 +14,7 @@ const navItems = [
   { href: '/settings', label: 'Settings', icon: <Settings size={20} /> },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen }: { isOpen: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = React.useState<UserProfile | null>(null);
@@ -46,7 +46,7 @@ export default function Sidebar() {
   }, [pathname]);
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
       <div className={styles.userProfile}>
         <div className={styles.avatar}><User size={24} /></div>
         <div className={styles.userInfo}>

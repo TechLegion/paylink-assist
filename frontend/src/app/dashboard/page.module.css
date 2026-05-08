@@ -352,7 +352,11 @@
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s;
-  min-width: 180px;
+  min-width: 160px;
+  max-width: 240px;
+  text-align: left;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .taskPill:hover {
@@ -372,11 +376,17 @@
   display: block;
   margin-bottom: 2px;
   color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pillTitle {
   font-size: 0.875rem;
   font-weight: 600;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .statusInfo {
@@ -387,6 +397,52 @@
   font-size: 0.875rem;
   color: var(--text-muted);
   flex: 1;
+}
+
+@media (max-width: 1024px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 1rem;
+  }
+  
+  .taskNav {
+    padding-bottom: 1rem;
+  }
+  
+  .taskPill {
+    min-width: 140px;
+    padding: 0.625rem 1rem;
+  }
+  
+  .taskCard, .summaryCard, .timelineCard, .pendingCard {
+    padding: 1.5rem;
+  }
+  
+  .timeline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  
+  .timelineItem {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .timelineDot {
+    margin-bottom: 0;
+  }
+  
+  .timelineLine {
+    display: none;
+  }
 }
 
 @keyframes fadeIn {

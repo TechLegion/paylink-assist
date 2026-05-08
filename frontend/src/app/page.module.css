@@ -327,3 +327,47 @@
   max-width: 80%;
   font-size: 1rem;
 }
+
+@media (max-width: 768px) {
+  .formCard {
+    padding: 1.5rem;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .stepper {
+    margin-bottom: 2rem;
+  }
+
+  .step {
+    padding: 0 0.5rem;
+  }
+
+  .stepLabel {
+    display: none;
+  }
+
+  .formTitle {
+    font-size: 1.5rem;
+  }
+
+  .bottomCards {
+    grid-template-columns: 1fr;
+  }
+
+  .payazaDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .payazaActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .payazaActions button {
+    width: 100%;
+  }
+}

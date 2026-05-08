@@ -10,6 +10,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const isAuthPage = pathname === '/login' || pathname === '/signup';
   const [signedIn, setSignedIn] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     const syncAuth = () => setSignedIn(isAuthenticated());
@@ -24,6 +25,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     };
   }, [pathname]);
 
+  // Close mobile menu on path change
+  React.useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
   // Auth pages own their full-screen layout.
   const showNav = !isAuthPage;
 
@@ -33,10 +39,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className={styles.appContainer}>
-      <TopNav />
+      <TopNav onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} isMenuOpen={isMobileMenuOpen} />
       <div className={styles.mainWrapper}>
-        {signedIn && <Sidebar />}
-        <main className={`${styles.pageContainer} ${!signedIn ? styles.publicPageContainer : ''}`}>
+        <Sidebar isOpen={isMobileMenuOpen} />
+        <main className={styles.pageContainer}>
           {children}
         </main>
       </div>

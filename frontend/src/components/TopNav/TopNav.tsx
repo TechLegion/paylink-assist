@@ -3,9 +3,10 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './TopNav.module.css';
-import { Bell, HelpCircle, LogIn, UserPlus, User, LogOut, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Bell, HelpCircle, LogIn, UserPlus, User, LogOut, ShieldCheck, CheckCircle2, Menu, X } from 'lucide-react';
 import { AUTH_CHANGED_EVENT, isAuthenticated, logout } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
 
 const navLinks = [
   { href: '/dashboard', label: 'Home' },
@@ -15,13 +16,21 @@ const navLinks = [
   { href: '/wallet', label: 'Wallet' },
 ];
 
+const mobileNavLinks = [
+  { href: '/dashboard', label: 'Dashboard', icon: <Menu size={20} /> },
+  { href: '/browse', label: 'Browse Tasks', icon: <Menu size={20} /> },
+  { href: '/escrow', label: 'Escrow History', icon: <Menu size={20} /> },
+  { href: '/badges', label: 'Verified Badges', icon: <Menu size={20} /> },
+  { href: '/settings', label: 'Settings', icon: <Menu size={20} /> },
+];
+
 const MOCK_NOTIFICATIONS = [
   { id: 1, title: 'Payment Secured', desc: '₦15,000 held in escrow for Furniture Assembly.', icon: <ShieldCheck size={16} color="#3b82f6" />, time: '2m ago' },
   { id: 2, title: 'Task Accepted', desc: 'Helper found for "Fix leaking tap".', icon: <CheckCircle2 size={16} color="#10b981" />, time: '1h ago' },
   { id: 3, title: 'Identity Verified', desc: 'Your account is now fully verified.', icon: <ShieldCheck size={16} color="#10b981" />, time: '2h ago' },
 ];
 
-export default function TopNav() {
+export default function TopNav({ onMenuToggle, isMenuOpen }: { onMenuToggle: () => void, isMenuOpen: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
   const [signedIn, setSignedIn] = React.useState(false);
@@ -45,24 +54,19 @@ export default function TopNav() {
     router.push('/login');
   };
 
-  const visibleLinks = signedIn
-    ? navLinks
-    : navLinks.filter(({ href }) => href === '/browse' || href === '/');
-
   return (
     <header className={styles.topNav}>
-      <div className={styles.logo}>PayLink Assist</div>
-      <nav className={styles.navLinks}>
-        {visibleLinks.map(({ href, label }) => (
-          <Link
-            key={label}
-            href={href}
-            className={`${styles.navLink} ${pathname === href ? styles.activeLink : ''}`}
-          >
-            {label}
-          </Link>
-        ))}
-      </nav>
+      <div className={styles.left}>
+        <button 
+          className={styles.menuToggle} 
+          onClick={onMenuToggle}
+          aria-label="Toggle Menu"
+        >
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+        <div className={styles.logo} onClick={() => router.push('/')}>PayLink Assist</div>
+      </div>
+
       <div className={styles.actions}>
         <div className={styles.notificationWrapper}>
           <button 
@@ -97,6 +101,10 @@ export default function TopNav() {
               </div>
             </div>
           )}
+        </div>
+
+        <div className={styles.themeToggleWrapper}>
+          <ThemeToggle />
         </div>
 
         <button className={styles.iconButton} aria-label="Help" onClick={() => alert('Help center coming soon!')}>

@@ -10,6 +10,7 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
 }
 
 .pageContainer {
@@ -29,4 +30,28 @@
   min-height: 100vh;
   width: 100vw;
   background-color: var(--background);
+}
+
+@media (max-width: 1024px) {
+  .pageContainer {
+    padding: 1.5rem 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .appContainer {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+  
+  .mainWrapper {
+    flex-direction: column;
+    overflow: visible;
+  }
+  
+  .pageContainer {
+    padding: 1rem;
+    overflow-y: visible;
+  }
 }
